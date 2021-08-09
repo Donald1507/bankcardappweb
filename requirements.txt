@@ -81,6 +81,7 @@ parso==0.8.2
 pickleshare==0.7.5
 Pillow==8.2.0
 pipreqs==0.4.10
+pywin32==301; platform_system == "Windows"
 prometheus-client==0.11.0
 prompt-toolkit==3.0.19
 protobuf==3.17.0
