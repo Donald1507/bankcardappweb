@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <h1>Bienvenue sur la "bank card application"</h1>
+</div>
+
+<div class="row">
+    <div class="col-4">
+        <img src="../static/images/images (1).jfif" alt="Service de carte bancaire">
+    </div>
+    <div class="col-8" style="font-size: 20px;">
+        <p>Un responsable d’une banque souhaite réduire le nombre de clients qui quittent leurs services
+            de carte de crédit. <br>
+            Il aimerait pouvoir anticiper le départ des clients afin de leur fournir de
+            meilleurs services et ainsi les retenir.</p>
+        <p>Grâce au Machine Learning, nous essaierons de prédire les éventuels clients qui
+            souhaiteraient quitter ce service pour que le responsable de la banque puisse atteindre son objectif. <br>
+            Le modèle utilisé dans cette application est la <b>Régression Logistique</b> avec les caractéristiques suivantes:
+            <ul>
+                <li>Performance: <b>90%</b></li>
+                <li>Rappel: <b>96%</b></li>
+            </ul>
+        </p>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col"><a class="btn btn-primary btn-lg" href="/one_pred" role="button">Prédiction individuelle</a></div>
+        <div class="col"><a class="btn btn-primary btn-lg" href="/csv_pred" role="button">Prédiction à partir de données CSV</a></div>
+        <div class="col"><a class="btn btn-primary btn-lg" href="/db_pred" role="button">Prédiction à partir de la base de données</a></div>
+    </div>
+
+    
+
+{% endblock content %}

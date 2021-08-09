@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <div class="row">
+        <div class="col-7">
+            <h2>Prédiction des clients à partir d'un tirage aléatoire dans la base de données</h2>
+            <br>
+            <p>
+                Vous avez la possibilité de tirer de manière aléatoire des clients à partir de la base de données
+                de la banque et de voir leurs informations et la prédiction associée à chacun d'eux.
+            </p>
+        </div>
+        <div class="col-5">
+            <form class="d-flex" method="POST">
+                <br><br>
+                <input class="form-control me-2" id="search_count" name="search_count" type="number" placeholder="Saisir ici..." min="0" step="1">
+                <button class="btn btn-outline-success" type="submit">Valider</button>
+              </form>
+        </div>
+    </div>
+
+        {% if  request.method == 'POST' %} 
+        <div class="table-responsive">
+            <table class="table-responsive table-striped table-bordered table-sm">
+                <caption>Liste des prédictions</caption>
+                <thead>
+                    <tr>
+                        <!-- 'CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag' -->
+                        {% for header in fieldnames %}
+                        <th> {{header}} </th>
+                        {% endfor %}
+                        <th> Prédiction </th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped">
+                    {% for row in new_results %}
+                    {% set new_results_loop = loop %}
+                    <tr>
+                        {% for index in range(0, len(fieldnames)) %}
+                        {% set fieldnames_loop = loop %}
+                            <td>{{row[index]}}</td>
+
+
+                            {% if ((fieldnames_loop.index ) == (len(fieldnames))) %}
+                            <td> {{prediction[new_results_loop.index - 1]}}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% endif %}
+
+
+{% endblock content %}

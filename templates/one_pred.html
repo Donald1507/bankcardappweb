@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <div class="row">
+        <h1>Prédiction individuelle</h1>
+    </div>
+
+    <div class="row" id="result_one_pred">
+        <p> {{prediction_text}} </p>
+    </div>
+
+
+    {% if  request.method == 'GET' %}
+
+    
+    <div class="card">
+        <img class="card-img-top" src="../static/images/téléchargement.jfif" alt="Card image cap">
+        <div class="card-body">
+                <!-- Main Input For Receiving Query to our ML -->
+            <form action="{{ url_for('one_prediction')}}" method="POST">
+                <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="Gender">Genre</label>
+                        <select class="form-control" name="Gender" id="Gender" required="required">
+                            <option></option>
+                            <option value="1">Masculin</option>
+                            <option value="0">Féminin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Marital_Status">Statut marital</label>
+                        <select class="form-control" name="Marital_Status" id="Marital_Status" required="required">
+                            <option></option>
+                            <option value="0">Célibataire</option>
+                            <option value="1">Marié(e)</option>
+                            <option value="2">Divorcée</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Income_Category">Catégorie de revenue annuel</label>
+                        <select class="form-control" name="Income_Category" id="Income_Category" required="required">
+                            <option></option>
+                            <option value="0">Moins de 40 000$</option>
+                            <option value="1">Entre 40 000$ et 60 000$</option>
+                            <option value="2">Entre 60 000$ et 80 000$</option>
+                            <option value="3">Entre 80 000$ et 120 000$</option>
+                            <option value="4">Plus de 120 000$</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Card_Category">Type de carte bancaire</label>
+                        <select class="form-control" name="Card_Category" id="Card_Category" required="required">
+                            <option></option>
+                            <option value="0">Blue</option>
+                            <option value="1">Silver</option>
+                            <option value="2">Gold</option>
+                            <option value="3">Platinum</option>
+                        </select>
+                    </div>
+    
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="Months_Inactive_12_mon">Période d'inactivité de la carte bancaire</label>
+                        <input class="form-control" type="number" id="Months_Inactive_12_mon" name="Months_Inactive_12_mon" placeholder="Entrer le nombre" required="required" min="0" max="12" aria-describedby="des_month"/>
+                        <small id="des_month" class="form-text text-muted"><i>Nombre de mois au cours des 12 derniers mois</i></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="Avg_Utilization_Ratio">Taux d'utilisation moyen de la carte</label>
+                        <input class="form-control" type="number" id="Avg_Utilization_Ratio" name="Avg_Utilization_Ratio" placeholder="Entrer le nombre" step="0.001" min=0 max=1 required="required" aria-describedby="des_taux"/>
+                        <small id="des_taux" class="form-text text-muted"> <i>Le taux devra être écrit en pourcentage décimal (nombre compris entre 0 et 1)</i> </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="Total_Relationship_Count">Nombre total de produits(services) détenus dans la banque</label>
+                        <input class="form-control" type="number" id="Total_Relationship_Count" name="Total_Relationship_Count" placeholder="Entrer le nombre" required="required" min="0" max="10"/>    
+                    </div> 
+                </div>
+            </div>
+                <br><br>
+                <!-- Button trigger modal -->
+                <button type="submit" class="btn btn-primary btn-block btn-large" data-toggle="modal" data-target="#exampleModalCenter">Predire</button>
+                
+            </form>
+            
+         </div>
+    </div>
+
+       
+    {% endif %}
+
+{% endblock content %}

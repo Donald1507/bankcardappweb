@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+            <div class="row">
+                <div class="col-7">
+                    <h2>Prédiction des clients à partir de données CSV</h2>
+                    <br><br>
+                    <p>
+                        Pour cette section, vous devez suivre la procédure suivante:
+                        <br>
+                        <ol>
+                            <li>insérer les noms des colonnes qui formeront la ligne de l'entête du tableau,</li>
+                            <li>insérer les informations d'un client, chaque information se termine par un point-virgule(;),</li>
+                            <li>aller à la ligne une fois toutes les informations du client insérées,</li>
+                            <li>insérer les informations des clients suivants en reprenant les points 2 et 3,</li>
+                            <li>soumettre le csv.</li>
+                        </ol>
+                    </p>
+                </div>
+                <div class="col-5">
+                    <form action="" method="POST">
+                        <label for="csvfile" class="form-label">Insérer vos données: </label>
+                        <textarea name="csv_file" id="csvfile" class="form-control" cols="40" rows="5"></textarea>
+                        <button class="btn btn-success mt-2">Soumettre le CSV</button>
+                    </form>
+                </div>
+            </div>
+            
+
+            {% if  request.method == 'POST' %} 
+            <div class="table-responsive">
+                <table class="table-responsive table-striped table-bordered table-sm">
+                    <caption>Liste des prédictions</caption>
+                    <thead>
+                        <tr>
+                            <!-- 'CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag' -->
+                            {% for header in fieldnames %}
+                            <th> {{header}} </th>
+                            {% endfor %}
+                            <th> Prédiction </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-striped">
+                        {% for row in new_results %}
+                        {% set new_results_loop = loop %}
+                        <tr>
+                            {% for index in range(0, len(fieldnames)) %}
+                            {% set fieldnames_loop = loop %}
+                                <td>{{row[index]}}</td>
+    
+    
+                                {% if ((fieldnames_loop.index ) == (len(fieldnames))) %}
+                                <td> {{prediction[new_results_loop.index - 1]}}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% endif %}
+
+{% endblock content %}
