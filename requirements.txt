@@ -81,7 +81,7 @@ parso==0.8.2
 pickleshare==0.7.5
 Pillow==8.2.0
 pipreqs==0.4.10
-pywin32==301; platform_system == "Windows"
+pywin32==300; platform_system == "Windows"
 prometheus-client==0.11.0
 prompt-toolkit==3.0.19
 protobuf==3.17.0
@@ -93,7 +93,6 @@ pydeck==0.6.2
 Pygments==2.9.0
 pyparsing==2.4.7
 PyPDF2==1.26.0
-pypiwin32==223
 pyrsistent==0.18.0
 python-dateutil==2.8.1
 pyttsx3==2.90
