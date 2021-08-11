@@ -44,7 +44,7 @@ body{
 }
 
 #result_one_pred{
-    background: rgba(255, 0, 0, 0.685);
+    background: black;
     font-size: 25px;
     font-weight: bold;
     color: white;
@@ -112,6 +112,11 @@ thead{
     color: white;
 }
 
+.form-check{
+    display: inline;
+    position: inherit;
+}
+
 footer{
     position: fixed;
     width: 100%;
@@ -141,3 +146,4 @@ footer .row .col-10 img{
     height: 28px;
     opacity: 0.5;
 }
+

@@ -1,9 +1,11 @@
 import csv
+from os import sep
 import pickle
 import numpy as np
 import pandas as pd
 import sqlite3
 from flask import Flask, request, jsonify, render_template
+from pandas.core.frame import DataFrame
 
 
 app = Flask(__name__)
@@ -54,22 +56,17 @@ def one_prediction():
 
 
 
-@app.route('/csv_pred', methods=['GET', 'POST'])
-def csv_prediction():
+@app.route('/file_pred', methods=['GET', 'POST'])
+def file_prediction():
     
     if request.method == 'GET':
-        return render_template('csv_pred.html')
+        return render_template('file_pred.html')
 
     elif request.method == 'POST':
-        results  = []
         
-        csv_file = request.form.get('csv_file').split('\n')
-        reader = csv.DictReader(csv_file, delimiter=';')
+        file = request.files['chosen_file']
         
-        for row in reader:
-            results.append(dict(row))
-        
-        data = pd.DataFrame(results)
+        data = pd.read_csv(file, sep=";")
         df = data[['CLIENTNUM','Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count','Attrition_Flag']]
         fieldnames = [item for item in df.columns]
         
@@ -79,14 +76,48 @@ def csv_prediction():
         for i in range(df1.shape[1]):
             new_results.append(df1[i].tolist())
         
-    
         
         df_new = df.drop('CLIENTNUM', axis=1)
         df_new = df_new.drop('Attrition_Flag', axis=1)        
         df_new =  encodage(df_new)
         prediction = model.predict(df_new)
         
-        return render_template('csv_pred.html', new_results=new_results, fieldnames=fieldnames, prediction=prediction, len= len)
+        return render_template('file_pred.html', new_results=new_results, fieldnames=fieldnames, prediction=prediction, len= len)
+    
+@app.route('/final_file_pred', methods = ['POST'])
+def final_file_prediction():
+    
+    client_num_list = request.form.getlist('client_num')
+    client_num_list = list(map(int, client_num_list))
+    
+    print(client_num_list)
+    
+    data = request.form.get('all_data')
+    data = eval(data)    
+    data = pd.DataFrame(data, columns=['CLIENTNUM','Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count','Attrition_Flag'])
+    
+    print(data)
+    
+    df = pd.DataFrame(columns=['CLIENTNUM','Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count','Attrition_Flag'])
+    
+    for client_num in client_num_list:
+        client_info = data.loc[data['CLIENTNUM'] == client_num]
+        df = df.append(client_info,ignore_index=True)
+        
+    columns_df = [item for item in df.columns]
+        
+    df1 = df.T
+        
+    new_results=[]
+    for i in range(df1.shape[1]):
+        new_results.append(df1[i].tolist())
+                
+    df_new = df.drop('CLIENTNUM', axis=1)
+    df_new = df_new.drop('Attrition_Flag', axis=1)        
+    df_new =  encodage(df_new)
+    prediction = model.predict(df_new)
+    
+    return render_template('final_file_pred.html', new_results=new_results, fieldnames=columns_df, prediction=prediction, len= len)
 
 #Connection à la base de données
 connection = sqlite3.connect("bankcard.db")
@@ -142,10 +173,8 @@ def db_prediction():
         connection = sqlite3.connect("bankcard.db")
         cursor = connection.cursor()
         
-        search_count = request.form.get('search_count') 
-        print(search_count)
-        
-       
+        search_count = request.form.get('search_count')
+               
         cursor.execute("SELECT CLIENTNUM, Gender, Marital_Status, Income_Category, Card_Category, " 
                        "Months_Inactive_12_mon, Avg_Utilization_Ratio, Total_Relationship_Count, Attrition_Flag FROM Client ORDER BY RANDOM() LIMIT " 
                        "{}".format(search_count))
@@ -163,9 +192,7 @@ def db_prediction():
         new_results=[]
         for i in range(df1.shape[1]):
             new_results.append(df1[i].tolist())
-        
-    
-        
+                
         df_new = df.drop('CLIENTNUM', axis=1)
         df_new = df_new.drop('Attrition_Flag', axis=1)        
         df_new =  encodage(df_new)
@@ -173,8 +200,52 @@ def db_prediction():
     
         return render_template('db_pred.html',new_results=new_results, fieldnames=columns_df, prediction=prediction, len= len)
 
+
+@app.route('/final_db_pred', methods=['POST'])
+def final_db_prediction():
+    
+    if request.method == 'POST':
+        
+        connection = sqlite3.connect("bankcard.db")
+        cursor = connection.cursor()
+        
+        client_num_list = request.form.getlist('client_num')
+        client_num_list = list(map(int, client_num_list))
+        
+        chosen_clients = []
+        
+        for client_num in client_num_list:
+            cursor.execute("SELECT CLIENTNUM, Gender, Marital_Status, Income_Category, Card_Category, " 
+                            "Months_Inactive_12_mon, Avg_Utilization_Ratio, Total_Relationship_Count, Attrition_Flag FROM Client WHERE CLIENTNUM=" 
+                            "{}".format(client_num)) 
+            
+            client_info = cursor.fetchone()
+            chosen_clients.append(client_info)
+            client_info = []
+        
+        chosen_clients = np.array(chosen_clients)   
+        
+        df = pd.DataFrame(chosen_clients, columns=['CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag'])
+        
+        columns_df = [item for item in df.columns]
+        
+        df1 = df.T
+        
+        new_results=[]
+        for i in range(df1.shape[1]):
+            new_results.append(df1[i].tolist())
+                
+        df_new = df.drop('CLIENTNUM', axis=1)
+        df_new = df_new.drop('Attrition_Flag', axis=1)        
+        df_new =  encodage(df_new)
+        prediction = model.predict(df_new)
+    
+        return render_template('final_db_pred.html',new_results=new_results, fieldnames=columns_df, prediction=prediction, len= len)
+
 connection.commit()
 connection.close()
 
+
 if __name__ == "__main__":
     app.run(debug=True)
+    

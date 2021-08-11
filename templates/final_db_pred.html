@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <div class="row">
+        <div class="col-7">
+            <h2>Prédiction des clients selectionnés</h2>
+            <br>
+        </div>
+    </div>
+
+        {% if  request.method == 'POST' %} 
+
+        <div class="table-responsive">
+            <table class="table-responsive table-striped table-bordered table-sm">
+                <caption>Liste des prédictions</caption>
+                <thead>
+                    <tr>
+                        {% for header in fieldnames %}
+                        <th> {{header}} </th>
+                        {% endfor %}
+                        <th> Prédiction </th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped">
+                    {% for row in new_results %}
+                    {% set new_results_loop = loop %}
+                    <tr>
+                        {% for index in range(0, len(fieldnames)) %}
+                        {% set fieldnames_loop = loop %}
+
+                            <td>{{row[index]}}</td>
+
+                            {% if ((fieldnames_loop.index ) == (len(fieldnames))) %}
+                            <td> {{prediction[new_results_loop.index - 1]}}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+
+{% endblock content %}
