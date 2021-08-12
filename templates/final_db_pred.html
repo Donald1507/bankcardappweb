@@ -2,6 +2,7 @@
 
 {% block content %}
     
+    <!-- content title -->
     <div class="row">
         <div class="col-7">
             <h2>Prédiction des clients selectionnés</h2>
@@ -9,6 +10,7 @@
         </div>
     </div>
 
+    <!-- Predicted result of selected clients form "db_pred.html" -->
         {% if  request.method == 'POST' %} 
 
         <div class="table-responsive">
@@ -16,21 +18,25 @@
                 <caption>Liste des prédictions</caption>
                 <thead>
                     <tr>
+                    <!-- fieldnames: list of headers ('CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag') -->
                         {% for header in fieldnames %}
                         <th> {{header}} </th>
                         {% endfor %}
+                    <!-- Adding of the prediction column -->
                         <th> Prédiction </th>
                     </tr>
                 </thead>
+
+                <!-- Table body: Client informations with their prediction-->
                 <tbody class="table-striped">
                     {% for row in new_results %}
                     {% set new_results_loop = loop %}
                     <tr>
                         {% for index in range(0, len(fieldnames)) %}
                         {% set fieldnames_loop = loop %}
-
+                            <!-- Putting every information of each client in the corresponding column -->
                             <td>{{row[index]}}</td>
-
+                            <!-- Putting the corresponding prediction -->
                             {% if ((fieldnames_loop.index ) == (len(fieldnames))) %}
                             <td> {{prediction[new_results_loop.index - 1]}}</td>
                             {% endif %}

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Home page of the application -->
 <div class="row">
     <h1>Bienvenue sur la "bank card application"</h1>
 </div>
@@ -9,6 +10,7 @@
     <div class="col-4">
         <img src="../static/images/images (1).jfif" alt="Service de carte bancaire">
     </div>
+    <!-- Explanation of the web application -->
     <div class="col-8" style="font-size: 20px;">
         <p>Un responsable d’une banque souhaite réduire le nombre de clients qui quittent leurs services
             de carte de crédit. <br>
@@ -24,6 +26,8 @@
         </p>
     </div>
     </div>
+    
+    <!-- Buttons of application options -->
     <div class="row">
         <div class="col"><a class="btn btn-dark btn-primary btn-lg" href="/one_pred" role="button">Prédiction individuelle</a></div>
         <div class="col"><a class="btn btn-dark btn-primary btn-lg" href="/file_pred" role="button">Prédiction à partir d'un fichier</a></div>

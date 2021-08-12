@@ -1,3 +1,4 @@
+#Importing the libraries and modules
 import csv
 from os import sep
 import pickle
@@ -7,12 +8,16 @@ import sqlite3
 from flask import Flask, request, jsonify, render_template
 from pandas.core.frame import DataFrame
 
-
+#Define the Flask application name
 app = Flask(__name__)
 
+#Loading the ML model
 model = pickle.load(open('model.pkl', 'rb'))
+
+#List of the features
 features_list = ['Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count']
 
+#Encoding function for "object" type features of the dataframe
 def encodage(dataframe):
     code = {
         'Attrited Customer':1, 'Existing Customer':0,
@@ -27,35 +32,39 @@ def encodage(dataframe):
     
     return dataframe
 
-
+#Route for "index.html" page
 @app.route("/")
 def home():
     return render_template("index.html", title="Accueil")
 
-    
+
+#Route for "one_pred.html" page    
 @app.route("/one_pred/", methods=['GET','POST'])
 def one_prediction():
     
     if request.method == 'GET':
-        return render_template('one_pred.html', title="Prédiction individuelle")
+        return render_template('one_pred.html')
     
     elif request.method == 'POST':
     
         #For rendering results on HTML GUI
         features_values = [float(x) for x in request.form.values()]
+        #Putting the values of the form in a dataframe
         final_features = pd.DataFrame(features_values, index = features_list).T
+        #Using the model for predicting
         prediction = model.predict(final_features)
         prediction = prediction[0]
 
+        #Final messages after predication
         if prediction == 'Existing Customer':
             output = 'Le client restera abonné au service de la carte bancaire.'
         else:
             output = 'Le client envisage de mettre fin au service de la carte bancaire.'
 
-        return render_template("one_pred.html", title="Prédiction individuelle", prediction_text='{}'.format(output))
+        return render_template("one_pred.html", prediction_text='{}'.format(output))
 
 
-
+#Route for "file_pred.html" page
 @app.route('/file_pred', methods=['GET', 'POST'])
 def file_prediction():
     
@@ -64,49 +73,59 @@ def file_prediction():
 
     elif request.method == 'POST':
         
+        #For rending file on HTML
         file = request.files['chosen_file']
         
+        #Opening as a dataframe ("data") when the file is a csv file 
         data = pd.read_csv(file, sep=";")
+        #New dataframe ("df") with specific columns for prediction
         df = data[['CLIENTNUM','Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count','Attrition_Flag']]
+        #Columns of "df" dataframe
         fieldnames = [item for item in df.columns]
         
-        df1 = df.T
+        df1 = df.T #Transpose the "df" dataframe for taking easily a client information with pandas library
         
         new_results=[]
         for i in range(df1.shape[1]):
-            new_results.append(df1[i].tolist())
+            new_results.append(df1[i].tolist()) #Put each row (clint information) in "new_results" list
         
         
-        df_new = df.drop('CLIENTNUM', axis=1)
-        df_new = df_new.drop('Attrition_Flag', axis=1)        
-        df_new =  encodage(df_new)
-        prediction = model.predict(df_new)
+        df_new = df.drop('CLIENTNUM', axis=1) #remove the 'CLIENTNUM' column (useless column)
+        df_new = df_new.drop('Attrition_Flag', axis=1)   #remove the 'Attrition_Flag' column (target) 
+        df_new =  encodage(df_new)              #encoding the dataframe of features only ("df_new")
+        prediction = model.predict(df_new)      #predict the "df_new" dataframe
         
         return render_template('file_pred.html', new_results=new_results, fieldnames=fieldnames, prediction=prediction, len= len)
-    
+ 
+ 
+#Route for "final_file_pred.html" page    
 @app.route('/final_file_pred', methods = ['POST'])
 def final_file_prediction():
     
-    client_num_list = request.form.getlist('client_num')
-    client_num_list = list(map(int, client_num_list))
+    #For rending clientnum of selected clients of "file_pred.html"
+    client_num_list = request.form.getlist('client_num') #list of strings
+    client_num_list = list(map(int, client_num_list))   #convert to list of int
     
-    print(client_num_list)
-    
-    data = request.form.get('all_data')
-    data = eval(data)    
+    #rending all the informations of the clients (type: string with list inside)
+    data = request.form.get('all_data')  
+    #bring out the list inside the string
+    data = eval(data)                     
+    #create a dataframe with all data and specific columns
     data = pd.DataFrame(data, columns=['CLIENTNUM','Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count','Attrition_Flag'])
-    
-    print(data)
-    
+
+    #create a empty dataframe 
     df = pd.DataFrame(columns=['CLIENTNUM','Gender','Marital_Status','Income_Category','Card_Category','Months_Inactive_12_mon','Avg_Utilization_Ratio','Total_Relationship_Count','Attrition_Flag'])
     
+    #Adding informations of selected clients in "df" dataframe
     for client_num in client_num_list:
         client_info = data.loc[data['CLIENTNUM'] == client_num]
         df = df.append(client_info,ignore_index=True)
+    
+    #Using the same process of "file_prediction()" function
+       
+    columns_df = [item for item in df.columns] 
         
-    columns_df = [item for item in df.columns]
-        
-    df1 = df.T
+    df1 = df.T      
         
     new_results=[]
     for i in range(df1.shape[1]):
@@ -119,11 +138,11 @@ def final_file_prediction():
     
     return render_template('final_file_pred.html', new_results=new_results, fieldnames=columns_df, prediction=prediction, len= len)
 
-#Connection à la base de données
+#Database connection
 connection = sqlite3.connect("bankcard.db")
 cursor = connection.cursor()
 
-#Création de la table Client (si elle n'existe pas)
+#Creation of "Client" table
 sql="""
     CREATE TABLE IF NOT EXISTS Client (
             CLIENTNUM INT,
@@ -149,9 +168,9 @@ sql="""
             Avg_Utilization_Ratio FLOAT
             ) """
             
-cursor.execute(sql) #Exécution de la requête de création de la table
+cursor.execute(sql) #execute the query
 
-#Lecture du fichier csv
+#reading the csv file
 """with open('Dataset.csv', 'r') as file: 
     no_records = 1
     for row in file:
@@ -161,7 +180,7 @@ cursor.execute(sql) #Exécution de la requête de création de la table
 connection.close()
 print("\n{} Enregistrements transférés!".format(no_records))"""
         
-        
+#Route for "db_pred.html"                
 @app.route('/db_pred', methods=['GET', 'POST'])
 def db_prediction():
     
@@ -170,18 +189,23 @@ def db_prediction():
     
     elif request.method == 'POST':
         
+        #database connection
         connection = sqlite3.connect("bankcard.db")
         cursor = connection.cursor()
         
+        #rending "search_count" on HTML 
         search_count = request.form.get('search_count')
-               
+        
+        #select clients randomly in the database with specific columns       
         cursor.execute("SELECT CLIENTNUM, Gender, Marital_Status, Income_Category, Card_Category, " 
                        "Months_Inactive_12_mon, Avg_Utilization_Ratio, Total_Relationship_Count, Attrition_Flag FROM Client ORDER BY RANDOM() LIMIT " 
                        "{}".format(search_count))
         
         random_query = cursor.fetchall()
         
-        random_list = np.array(random_query)    
+        random_list = np.array(random_query) 
+        
+        #Using the same process of "file_prediction()" function
         
         df = pd.DataFrame(random_list, columns=['CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag'])
         
@@ -206,9 +230,11 @@ def final_db_prediction():
     
     if request.method == 'POST':
         
+        #Database connection
         connection = sqlite3.connect("bankcard.db")
         cursor = connection.cursor()
         
+        #For rending clientnum of selected clients of "file_pred.html"
         client_num_list = request.form.getlist('client_num')
         client_num_list = list(map(int, client_num_list))
         
@@ -223,7 +249,9 @@ def final_db_prediction():
             chosen_clients.append(client_info)
             client_info = []
         
-        chosen_clients = np.array(chosen_clients)   
+        chosen_clients = np.array(chosen_clients)  
+        
+        #Using the same process of "file_prediction()" function 
         
         df = pd.DataFrame(chosen_clients, columns=['CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag'])
         

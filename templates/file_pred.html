@@ -2,6 +2,7 @@
 
 {% block content %}
             <div class="row">
+                <!-- Content instructions -->
                 <div class="col-7">
                     <h2>Prédiction des clients à partir de données CSV</h2>
                     <br><br>
@@ -17,6 +18,7 @@
                         </ol>
                     </p>
                 </div>
+                <!-- Area for submitting the file (required format: csv, txt, xlsx) -->
                 <div class="col-5">
                     <form enctype="multipart/form-data" action="" method="POST">
                         <input class="btn btn-dark btn-success mt-2 btn-lg" type="file" id="chosen_file" name="chosen_file" accept=".csv, .xlsx, .txt" placeholder="Ouvrir...">
@@ -25,20 +27,23 @@
                 </div>
             </div>
             
-
+            <!-- Answer of the server after submitting the file -->
             {% if  request.method == 'POST' %}
         <form action="{{url_for('final_file_prediction')}}" method="POST"> 
             <div class="table-responsive">
                 <table class="table-responsive table-striped table-bordered table-sm">
                     <caption>Liste des prédictions</caption>
+
+                    <!-- Table head: first row of the table -->
                     <thead>
                         <tr>
                             <th>
+                                <!-- First checkbox (table first column) -->
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" onclick="toggle(this);" value="" id="flexCheckDefault">
                                   </div>
                             </th>
-
+                                <!-- JavaScript fonction for selecting all checkboxes -->
                             <script>
                                 function toggle(source) {
                                     var checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -49,12 +54,14 @@
                                     }       
                             </script>
   
-                            <!-- 'CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag' -->
-                            {% for header in fieldnames %}
+                    <!-- fieldnames: list of headers ('CLIENTNUM','Gender', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_Inactive_12_mon', 'Avg_Utilization_Ratio', 'Total_Relationship_Count', 'Attrition_Flag') -->
+                        {% for header in fieldnames %}
                             <th> {{header}} </th>
                             {% endfor %}
                         </tr>
                     </thead>
+
+                    <!-- Table body: client informations in the given file-->
                     <tbody class="table-striped">
                         {% for row in new_results %}
                         {% set new_results_loop = loop %}
@@ -64,12 +71,13 @@
 
                             {% if ((fieldnames_loop.index ) == 1) %}
                             <td>
+                                <!-- Send the "CLIENTNUM" of each selected row of the table to "app.py"-->
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="client_num" value="{{row[0]}}" id="flexCheckDefault">
                                   </div>
                             </td> 
                             {% endif %}
-                            
+                                 <!-- Putting every information of each client in the corresponding column -->
                                 <td>{{row[index]}}</td>
                             {% endfor %}
                         </tr>
@@ -77,6 +85,8 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Send to "app.py" all the result of all the table -->
             <input type="hidden" name="all_data" value="{{new_results}}">
             
             <button class="btn btn-dark btn-success mt-2 btn-lg" type="submit">Prédire la selection</button>
