@@ -3,16 +3,14 @@
 {% block content %}
     
     <!-- content title -->
-    <div class="row">
-        <div class="col-7">
-            <h2>Prédiction des clients selectionnés</h2>
-            <br>
-        </div>
+    <div class="row" id="final_file_pred_title">
+            <h1>Prédiction des clients selectionnés</h1>
     </div>
 
     <!-- Predicted result of selected clients form "db_pred.html" -->
         {% if  request.method == 'POST' %} 
 
+    <section class="block_content">
         <div class="table-responsive">
             <table class="table-responsive table-striped table-bordered table-sm">
                 <caption>Liste des prédictions</caption>
@@ -47,6 +45,8 @@
             </table>
         </div>
         {% endif %}
+    </section>
+        
 
 
 {% endblock content %}

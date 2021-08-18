@@ -9,11 +9,15 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Bank card app</title>
   </head>
   <body>
     <header>
+        <!-- header left part -->
+        <a class="navbar-brand" href="/">BANK CARD APP</a>
+
+        <!-- header right part -->
          {% include "partials/_navbar.html" %}  <!--_navbar.html -->
     </header>
         

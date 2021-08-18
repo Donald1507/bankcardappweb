@@ -2,24 +2,27 @@
 
 {% block content %}
     
-    <div class="row">
+    <div class="row" id="one_pred_title">
         <h1>Prédiction individuelle</h1>
     </div>
     <!-- Area for showing the prediction after submitting the form -->
-    <div class="row" id="result_one_pred">
-        <p> {{prediction_text}} </p>
-    </div>
-
+    <section class="block_content">
+        <div class="row" id="result_one_pred">
+            <p> {{prediction_text}}</p>
+        </div>
+    </section>
 
     {% if  request.method == 'GET' %}
     
     <div class="card">
-        <img class="card-img-top" src="../static/images/téléchargement.jfif" alt="Card image cap">
+        <div class="row" id="imgform">
+            <img class="card-img-top" src="../static/images/card-top-img.png" alt="Card image cap">
+        </div>
         <div class="card-body">
                 <!-- Main Input For Receiving Query to our ML -->
-            <form action="{{ url_for('one_prediction')}}" method="POST">
+            <form id="one_pred" action="{{ url_for('one_prediction')}}" method="POST">
                 <div class="row">
-                <div class="col-6">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="Gender">Genre</label>
                         <select class="form-control" name="Gender" id="Gender" required="required">
@@ -60,7 +63,7 @@
                     </div>
     
                 </div>
-                <div class="col-6">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="Months_Inactive_12_mon">Période d'inactivité de la carte bancaire</label>
                         <input class="form-control" type="number" id="Months_Inactive_12_mon" name="Months_Inactive_12_mon" placeholder="Entrer le nombre" required="required" min="0" max="12" aria-describedby="des_month"/>
